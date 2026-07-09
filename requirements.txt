@@ -1,0 +1,18 @@
+# --- Backend ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+jinja2==3.1.5
+python-multipart==0.0.20
+
+# --- IA generativa ---
+anthropic==0.42.0
+
+# --- Configuración ---
+python-dotenv==1.0.1
+
+# --- Persistencia (SQLite vía stdlib sqlite3, ORM ligero opcional) ---
+# Usamos sqlite3 de la librería estándar; no requiere paquete extra.
+
+# --- Pruebas ---
+pytest==8.3.4
+httpx==0.28.1

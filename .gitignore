@@ -1,0 +1,25 @@
+# Entorno y credenciales (RNF-02: nunca subir la API key)
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Base de datos local (SQLite)
+*.db
+*.sqlite
+*.sqlite3
+
+# Sistema / editor
+.DS_Store
+.idea/
+.vscode/
