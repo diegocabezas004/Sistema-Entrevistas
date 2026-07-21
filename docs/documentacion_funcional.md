@@ -43,6 +43,20 @@ Los perfiles son ficticios/académicos; no se piden datos personales sensibles (
 6. **Finalizar** (RF-06/RF-07): la IA entrega el resultado general y el plan de mejora.
 7. **Consultar historial** (RF-08/RF-09): revisar entrevistas pasadas y comparar avances.
 
+### 4.1 Interfaz web (tres pantallas)
+
+El sistema ofrece una **interfaz web** (server-rendered con Jinja2) que guía el flujo anterior sin ambigüedad (RNF-07). Se accede en `http://127.0.0.1:8000/` y consta de tres pantallas encadenadas:
+
+| Pantalla | Ruta | Qué hace |
+|---|---|---|
+| **Configurar** | `/ui` | Formulario de configuración (rol, tecnología, nivel, idioma, cantidad, tipo). Incluye tres **escenarios de demostración** listos para un clic y el **historial** de sesiones anteriores con su puntaje. |
+| **Responder** | `/ui/entrevistas/{id}` | Muestra la pregunta activa y un recuadro de progreso. Al enviar la respuesta, la IA la evalúa y aparece la retroalimentación (fortalezas, errores, omisiones, respuesta mejorada) antes de pasar a la siguiente. |
+| **Resultado** | `/ui/entrevistas/{id}/resultado` | Puntaje general, nivel estimado, áreas fuertes y de mejora, plan de estudio y el desglose pregunta por pregunta. |
+
+> Las llamadas a la IA se hacen al entrar a cada pantalla: si una falla, basta **recargar la página** para reintentar, sin perder el avance de la sesión (RF-12).
+
+Además de la interfaz web, existe una **API REST** equivalente (documentada en `/docs` de FastAPI) para uso programático; ambas comparten la misma lógica de negocio.
+
 ## 5. Entradas
 
 | Entrada | Ejemplo |

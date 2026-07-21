@@ -14,19 +14,20 @@
 
 ## Sugerencia de reparto por módulos
 
-El proyecto tiene 8 módulos que pueden distribuirse. Ajusten según el tamaño del equipo:
+El proyecto tiene 9 módulos que pueden distribuirse. Ajusten según el tamaño del equipo:
 
-| Área | Módulos / Archivos | Requisitos |
-|---|---|---|
-| Integración con IA | `app/ai_client/` | RF-10, RF-12, RNF-02, RNF-05 |
-| Validación | `app/validation/` | RF-11, RF-12, RNF-04 |
-| Generación de preguntas | `app/questions_engine/` | RF-02 |
-| Evaluación | `app/evaluation_engine/` | RF-04, RF-05 |
-| Retroalimentación | `app/feedback/` | RF-06, RF-07 |
-| Persistencia | `app/storage/` | RF-08, RF-09, RF-10 |
-| Orquestación | `app/interview/` | RF-01…RF-08 |
-| API REST | `app/api/`, `app/main.py` | RF-12, RNF-06, RNF-07 |
-| Documentación | `/docs`, `README.md` | Sección 9 rúbrica |
+| Área | Módulos / Archivos | Pruebas | Requisitos |
+|---|---|---|---|
+| Integración con IA | `app/ai_client/` | `tests/test_ai_client.py` | RF-10, RF-12, RNF-02, RNF-05 |
+| Validación | `app/validation/` | `tests/test_validation.py` | RF-11, RF-12, RNF-04 |
+| Generación de preguntas | `app/questions_engine/` | `tests/test_questions_engine.py` | RF-02 |
+| Evaluación | `app/evaluation_engine/` | `tests/test_evaluation_engine.py` | RF-04, RF-05 |
+| Retroalimentación | `app/feedback/` | `tests/test_feedback.py` | RF-06, RF-07 |
+| Persistencia | `app/storage/` | `tests/test_storage.py` | RF-08, RF-09, RF-10 |
+| Orquestación | `app/interview/` | `tests/test_interview.py` | RF-01…RF-08 |
+| API REST | `app/api/`, `app/main.py` | `tests/test_api.py` | RF-12, RNF-06, RNF-07 |
+| Interfaz web (Jinja2) | `app/web/` (rutas, plantillas, estilos) | `tests/test_web.py` | RNF-07, RF-01…RF-09 |
+| Documentación | `/docs`, `README.md` | — | Sección 9 rúbrica |
 
 ---
 
@@ -86,3 +87,5 @@ El proyecto tiene 8 módulos que pueden distribuirse. Ajusten según el tamaño 
 - ¿Cómo se mapean los errores de negocio a códigos HTTP (RNF-06)?
 - ¿Por qué se calcula un promedio local además del puntaje que da la IA?
 - ¿Cómo se asegura que la API key nunca esté en el código (RNF-02)?
+- ¿Por qué la interfaz web no duplica lógica de negocio? (consume el mismo `InterviewService` que la API REST)
+- ¿Por qué las llamadas a la IA en la interfaz web se hacen al entrar a la pantalla (GET) y no antes? (permite reintentar recargando sin romper la sesión, RF-12)

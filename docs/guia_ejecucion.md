@@ -74,6 +74,7 @@ El servidor arranca en `http://127.0.0.1:8000` (configurable con `APP_HOST`/`APP
 
 ## 7. Probar que funciona
 
+- **Interfaz web (recomendado para la demo):** abre <http://127.0.0.1:8000/> en el navegador. Son tres pantallas: configurar → responder → resultado. La pantalla inicial incluye tres escenarios de demostración listos para un clic.
 - **Documentación interactiva (Swagger):** abre <http://127.0.0.1:8000/docs> en el navegador.
 - **Health check:**
 
@@ -95,7 +96,7 @@ El servidor arranca en `http://127.0.0.1:8000` (configurable con `APP_HOST`/`APP
 pytest -q
 ```
 
-Las 67 pruebas corren sin API key (usan motores simulados) y una base SQLite temporal.
+Las 80 pruebas corren sin API key (usan motores simulados) y una base SQLite temporal.
 
 ## 9. La base de datos
 
