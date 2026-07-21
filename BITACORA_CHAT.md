@@ -132,11 +132,28 @@
 
 ---
 
+## Turno 12 — "revisá dónde quedamos" → meter saldo → "haz los 3 escenarios ya"
+
+**Usuario:** pidió revisar el estado, confirmó que había metido saldo/ajustado la API key en `.env`, y dio luz verde a correr los 3 escenarios reales.
+
+**Se hizo:**
+- Se revisó el estado (67 pruebas verdes, backend completo) y se leyó esta bitácora.
+- **Ping real a la API** vía `ai_client`: conexión OK con `claude-haiku-4-5`, confirmando key válida y saldo disponible.
+- Arnés de prueba (fuera de la app, en scratchpad) que usa el `InterviewService` real: inicia → genera preguntas → un "candidato" simulado con IA responde a distinto nivel por escenario → evalúa → finaliza. Escribe la evidencia por escenario en `/docs`.
+- **Hallazgo de robustez:** con `ANTHROPIC_MAX_TOKENS=1500` una evaluación práctica larga truncó el JSON (el `ai_client` reintentó y lanzó error controlado, RF-12/RNF-06 funcionando). Se subió a **2500** en `.env` (config, sin tocar código) y se re-corrió limpio.
+- Se reseteó la BD y se corrieron los **3 escenarios completos con IA real**:
+  - `docs/evidencia_escenario_1_junior.md` (Python conceptual, 3 preguntas, general 78/100).
+  - `docs/evidencia_escenario_2_intermedio.md` (Python + APIs REST mixta, 3 preguntas, general 76/100).
+  - `docs/evidencia_escenario_3_arquitectura.md` (sistemas distribuidos, 2 preguntas, general 75/100).
+- Cada evidencia incluye: config, Q&A, evaluación multidimensional, resultado general, plan de mejora y tabla de trazabilidad (RF-10/RNF-05). 67 pruebas siguen verdes.
+
+---
+
 ## Pendientes (para retomar)
 
-1. **Correr los 3 escenarios reales (§7)** — junior, intermedio, arquitectura. Requiere `ANTHROPIC_API_KEY` en `.env`. Pedir a Claude: *"corre los escenarios reales"*.
+1. ~~Correr los 3 escenarios reales (§7).~~ ✅ **Hecho en el Turno 12.**
 2. **Llenar nombres** en `docs/evidencia_individual.md`.
-3. (Opcional) **Commit inicial** del trabajo en una rama.
+3. (Opcional) **Commit** del trabajo (escenarios reales + docs) — pedir a Claude cuando se quiera.
 
 ---
 
