@@ -9,11 +9,12 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-# Aviso obligatorio (CLAUDE.md §12): la evaluación es práctica, no certificación.
-DISCLAIMER = (
-    "Esta es una herramienta de práctica para entrevistas. No es una "
-    "certificación oficial ni garantiza resultados en procesos reales."
-)
+# Aviso obligatorio (CLAUDE.md §12). Se define en `app.config` para que la API y
+# la interfaz web lo compartan sin depender una de la otra; se reexporta aquí
+# porque es parte del contrato de salida de la API.
+from app.config import DISCLAIMER
+
+__all__ = ["DISCLAIMER", "ConfigRequest", "RespuestaRequest", "ErrorResponse"]
 
 
 class ConfigRequest(BaseModel):

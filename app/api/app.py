@@ -7,15 +7,20 @@ El módulo `interview` orquesta; aquí solo se adapta HTTP ↔ servicio.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.ai_client import AIClientError, AIConfigError
 from app.api.schemas import DISCLAIMER, ConfigRequest, RespuestaRequest
 from app.interview import InterviewService, interview_service
 from app.validation import ValidationError
+from app.web import router as web_router
+
+_ESTATICOS = Path(__file__).resolve().parent.parent / "web" / "static"
 
 
 def get_service() -> InterviewService:
@@ -58,6 +63,16 @@ def create_app() -> FastAPI:
             status_code=502,
             content={"error": "Fallo al generar la respuesta de IA", "detalle": str(exc)},
         )
+
+    # ------------------- Interfaz web (Jinja2, RNF-07) ------------------- #
+    # La UI vive en `app.web` y consume el mismo InterviewService que la API,
+    # así que no duplica lógica de negocio: solo presenta.
+    app.mount("/static", StaticFiles(directory=str(_ESTATICOS)), name="static")
+    app.include_router(web_router)
+
+    @app.get("/", include_in_schema=False)
+    async def inicio() -> RedirectResponse:
+        return RedirectResponse("/ui")
 
     # ---------------------------- Rutas ---------------------------- #
     @app.get("/health", tags=["sistema"])

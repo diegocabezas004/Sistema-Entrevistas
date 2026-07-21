@@ -18,6 +18,14 @@ from dotenv import load_dotenv
 _ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(_ROOT / ".env")
 
+# Aviso obligatorio (CLAUDE.md §12): la evaluación es práctica, no certificación.
+# Vive aquí, en un módulo sin dependencias internas, para que tanto la API REST
+# como la interfaz web lo usen sin importarse entre sí.
+DISCLAIMER = (
+    "Esta es una herramienta de práctica para entrevistas. No es una "
+    "certificación oficial ni garantiza resultados en procesos reales."
+)
+
 
 @dataclass(frozen=True)
 class Settings:

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Sala de entrevista{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400..600&display=swap">
+  <link rel="stylesheet" href="/static/estilos.css">
+</head>
+<body>
+  <div class="marco">
+
+    <aside class="riel">
+      <a class="marca" href="/ui">
+        <span class="marca__nombre">Sala de<br>entrevista</span>
+        <span class="marca__meta">Simulador con IA generativa</span>
+      </a>
+
+      <div class="riel__cuerpo">
+        {% block riel %}{% endblock %}
+      </div>
+
+      <p class="aviso">{{ disclaimer }}</p>
+    </aside>
+
+    <main class="lienzo">
+      {% if error %}
+      <p class="alerta" role="alert">{{ error }}</p>
+      {% endif %}
+
+      {% block contenido %}{% endblock %}
+    </main>
+
+  </div>
+
+  <script>
+    // Estado de espera al enviar: las llamadas a la IA tardan unos segundos y
+    // el botón debe dejar claro que ya se está trabajando. Progressive
+    // enhancement: sin JavaScript el formulario funciona igual.
+    document.querySelectorAll('form[data-pendiente]').forEach(function (form) {
+      form.addEventListener('submit', function () {
+        var boton = form.querySelector('button[type=submit]');
+        if (!boton || form.dataset.enviado) return;
+        form.dataset.enviado = '1';
+        boton.disabled = true;
+        boton.textContent = form.dataset.pendiente;
+      });
+    });
+
+    // Al volver con el botón "atrás" el navegador restaura el DOM tal cual,
+    // así que hay que devolver el botón a su estado utilizable.
+    window.addEventListener('pageshow', function (evento) {
+      if (!evento.persisted) return;
+      document.querySelectorAll('form[data-pendiente]').forEach(function (form) {
+        var boton = form.querySelector('button[type=submit]');
+        if (!boton) return;
+        delete form.dataset.enviado;
+        boton.disabled = false;
+        if (form.dataset.etiqueta) boton.textContent = form.dataset.etiqueta;
+      });
+    });
+  </script>
+  {% block guion %}{% endblock %}
+</body>
+</html>

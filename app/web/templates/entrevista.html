@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block titulo %}Pregunta {{ pregunta.orden if pregunta else '' }} · {{ ctx.rol }}{% endblock %}
+
+{% block riel %}
+<p class="riel__titulo">Sesión</p>
+<dl class="ficha">
+  <div class="ficha__par"><dt>Puesto</dt><dd>{{ ctx.rol }}</dd></div>
+  <div class="ficha__par"><dt>Tecnología</dt><dd>{{ ctx.tecnologia }}</dd></div>
+  <div class="ficha__par"><dt>Nivel</dt><dd>{{ ctx.nivel }}</dd></div>
+  <div class="ficha__par"><dt>Tipo</dt><dd>{{ ctx.tipo }}</dd></div>
+</dl>
+
+<p class="riel__titulo">Preguntas</p>
+{% include "_recorrido.html" %}
+
+{% if respondidas > 0 %}
+<a class="riel__salida" href="/ui/entrevistas/{{ ctx.id }}/resultado">Terminar y ver resultado</a>
+{% endif %}
+{% endblock %}
+
+{% block contenido %}
+{% if pregunta %}
+<article class="pregunta">
+  <header class="pregunta__cabecera">
+    <span class="pregunta__numeral">{{ "%02d"|format(pregunta.orden) }}</span>
+    <div class="pregunta__contexto">
+      <p class="antetitulo">Pregunta {{ pregunta.orden }} de {{ ctx.total }}</p>
+      <p class="pregunta__tema">{{ pregunta.tema }} · nivel {{ pregunta.dificultad }}</p>
+    </div>
+  </header>
+
+  <h1 class="pregunta__texto">{{ pregunta.pregunta }}</h1>
+
+  {% if pregunta.criterios %}
+  <p class="criterios__rotulo" id="rotulo-criterios">Se evalúa</p>
+  <ul class="criterios" aria-labelledby="rotulo-criterios">
+    {% for criterio in pregunta.criterios %}
+    <li class="criterio">{{ criterio }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <form class="respuesta" method="post"
+        action="/ui/entrevistas/{{ ctx.id }}/preguntas/{{ pregunta.id }}/respuesta"
+        data-pendiente="Evaluando tu respuesta…" data-etiqueta="Enviar respuesta">
+    <label class="respuesta__label" for="respuesta">Tu respuesta</label>
+    <textarea id="respuesta" name="respuesta" rows="10" required maxlength="5000"
+              placeholder="Explica tu razonamiento como lo harías en voz alta frente a la persona que te entrevista."></textarea>
+    <div class="respuesta__pie">
+      <button type="submit" class="boton boton--principal">Enviar respuesta</button>
+      <span class="formulario__nota">La IA evalúa precisión, claridad, profundidad y estructura.</span>
+    </div>
+  </form>
+</article>
+{% else %}
+<article class="pregunta">
+  <h1 class="pregunta__texto">No hay una pregunta abierta en este momento.</h1>
+  <p class="entrada">Recarga la página para generar la siguiente, o revisa el resultado con lo que ya respondiste.</p>
+  <div class="acciones">
+    <a class="boton boton--principal" href="/ui/entrevistas/{{ ctx.id }}">Recargar</a>
+    <a class="boton" href="/ui/entrevistas/{{ ctx.id }}/resultado">Ver resultado</a>
+  </div>
+</article>
+{% endif %}
+
+{% if ultima %}
+<section class="seccion">
+  <h2 class="seccion__titulo">Retroalimentación de la pregunta {{ ultima.orden }}</h2>
+
+  <div class="marcador">
+    <span class="marcador__valor">{{ ultima.evaluacion.puntaje }}</span>
+    <span class="marcador__escala">/100</span>
+    <span class="marcador__banda">{{ ultima.banda }}</span>
+  </div>
+  <div class="barra"><span class="barra__relleno" style="width: {{ ultima.evaluacion.puntaje }}%"></span></div>
+
+  {% if not ultima.evaluacion.coherente_con_configuracion %}
+  <p class="alerta alerta--suave">La IA marcó esta evaluación como poco coherente con la configuración de la entrevista. Tómala con reservas.</p>
+  {% endif %}
+
+  <div class="juicio">
+    {% if ultima.evaluacion.fortalezas %}
+    <div class="juicio__bloque">
+      <h3 class="juicio__titulo">Lo que hiciste bien</h3>
+      <ul class="lista">{% for t in ultima.evaluacion.fortalezas %}<li>{{ t }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if ultima.evaluacion.errores %}
+    <div class="juicio__bloque">
+      <h3 class="juicio__titulo">Errores</h3>
+      <ul class="lista">{% for t in ultima.evaluacion.errores %}<li>{{ t }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if ultima.evaluacion.omisiones %}
+    <div class="juicio__bloque">
+      <h3 class="juicio__titulo">Lo que faltó</h3>
+      <ul class="lista">{% for t in ultima.evaluacion.omisiones %}<li>{{ t }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if ultima.evaluacion.respuesta_mejorada %}
+  <details class="detalle">
+    <summary class="detalle__titulo">Ver una respuesta más completa</summary>
+    <p class="detalle__cuerpo">{{ ultima.evaluacion.respuesta_mejorada }}</p>
+  </details>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

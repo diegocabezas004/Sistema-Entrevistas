@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block titulo %}Resultado · {{ ctx.rol }}{% endblock %}
+
+{% block riel %}
+<p class="riel__titulo">Sesión</p>
+<dl class="ficha">
+  <div class="ficha__par"><dt>Puesto</dt><dd>{{ ctx.rol }}</dd></div>
+  <div class="ficha__par"><dt>Tecnología</dt><dd>{{ ctx.tecnologia }}</dd></div>
+  <div class="ficha__par"><dt>Nivel buscado</dt><dd>{{ ctx.nivel }}</dd></div>
+  <div class="ficha__par"><dt>Tipo</dt><dd>{{ ctx.tipo }}</dd></div>
+</dl>
+
+<p class="riel__titulo">Puntaje por pregunta</p>
+{% include "_recorrido.html" %}
+
+<a class="riel__salida" href="/ui">Practicar otra entrevista</a>
+{% endblock %}
+
+{% block contenido %}
+{% if resumen %}
+<header class="encabezado">
+  <p class="antetitulo">Resultado de la sesión</p>
+  <h1 class="titular">{{ ctx.rol }}<br>{{ ctx.tecnologia }}</h1>
+</header>
+
+<section class="veredicto">
+  <div class="veredicto__cifra">
+    <span class="veredicto__valor">{{ resumen.puntaje_general }}</span>
+    <span class="veredicto__escala">/100</span>
+  </div>
+  <div class="veredicto__lectura">
+    <p class="veredicto__banda">{{ banda }}</p>
+    <p class="veredicto__nivel">Nivel estimado: <strong>{{ resumen.nivel_estimado }}</strong></p>
+    <p class="veredicto__promedio">Promedio de tus respuestas: {{ "%.1f"|format(resumen.promedio_calculado) }}</p>
+  </div>
+  <div class="barra barra--gruesa">
+    <span class="barra__relleno barra__relleno--acento" style="width: {{ resumen.puntaje_general }}%"></span>
+  </div>
+</section>
+
+<section class="seccion">
+  <div class="juicio">
+    <div class="juicio__bloque">
+      <h2 class="juicio__titulo">Áreas fuertes</h2>
+      {% if resumen.areas_fuertes %}
+      <ul class="lista">{% for t in resumen.areas_fuertes %}<li>{{ t }}</li>{% endfor %}</ul>
+      {% else %}
+      <p class="vacio">La IA no identificó áreas destacadas en esta sesión.</p>
+      {% endif %}
+    </div>
+    <div class="juicio__bloque">
+      <h2 class="juicio__titulo">Áreas de mejora</h2>
+      {% if resumen.areas_mejora %}
+      <ul class="lista">{% for t in resumen.areas_mejora %}<li>{{ t }}</li>{% endfor %}</ul>
+      {% else %}
+      <p class="vacio">Sin áreas de mejora señaladas.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% if resumen.plan_de_estudio %}
+<section class="seccion">
+  <h2 class="seccion__titulo">Plan de estudio</h2>
+  <p class="seccion__nota">Ordenado por lo que más te conviene atacar primero, según cómo respondiste hoy.</p>
+  <ol class="plan">
+    {% for paso in resumen.plan_de_estudio %}
+    <li class="plan__paso">
+      <span class="plan__n">{{ "%02d"|format(loop.index) }}</span>
+      <span class="plan__texto">{{ paso }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+{% else %}
+<header class="encabezado">
+  <p class="antetitulo">Resultado de la sesión</p>
+  <h1 class="titular">Todavía no hay resultado</h1>
+  <p class="entrada">
+    El resumen se genera cuando la entrevista tiene al menos una respuesta evaluada.
+    Vuelve a la sesión, responde una pregunta y regresa aquí.
+  </p>
+  <div class="acciones">
+    <a class="boton boton--principal" href="/ui/entrevistas/{{ ctx.id }}">Volver a la sesión</a>
+    <a class="boton" href="/ui">Configurar otra entrevista</a>
+  </div>
+</header>
+{% endif %}
+
+<section class="seccion">
+  <h2 class="seccion__titulo">Pregunta por pregunta</h2>
+  {% for p in preguntas %}
+  <article class="revision">
+    <header class="revision__cabecera">
+      <span class="revision__n">{{ "%02d"|format(p.orden) }}</span>
+      <div class="revision__titulo">
+        <p class="revision__tema">{{ p.tema }}</p>
+        <p class="revision__pregunta">{{ p.pregunta }}</p>
+      </div>
+      {% if p.evaluacion %}
+      <span class="revision__puntaje">{{ p.evaluacion.puntaje }}</span>
+      {% endif %}
+    </header>
+
+    {% if p.evaluacion %}
+    <div class="barra"><span class="barra__relleno" style="width: {{ p.evaluacion.puntaje }}%"></span></div>
+    <p class="revision__banda">{{ p.banda }}</p>
+
+    <details class="detalle">
+      <summary class="detalle__titulo">Ver tu respuesta y la retroalimentación</summary>
+      <div class="detalle__cuerpo">
+        <h3 class="juicio__titulo">Lo que respondiste</h3>
+        <p class="cita">{{ p.respuesta }}</p>
+
+        <div class="juicio">
+          {% if p.evaluacion.fortalezas %}
+          <div class="juicio__bloque">
+            <h3 class="juicio__titulo">Fortalezas</h3>
+            <ul class="lista">{% for t in p.evaluacion.fortalezas %}<li>{{ t }}</li>{% endfor %}</ul>
+          </div>
+          {% endif %}
+          {% if p.evaluacion.errores %}
+          <div class="juicio__bloque">
+            <h3 class="juicio__titulo">Errores</h3>
+            <ul class="lista">{% for t in p.evaluacion.errores %}<li>{{ t }}</li>{% endfor %}</ul>
+          </div>
+          {% endif %}
+          {% if p.evaluacion.omisiones %}
+          <div class="juicio__bloque">
+            <h3 class="juicio__titulo">Omisiones</h3>
+            <ul class="lista">{% for t in p.evaluacion.omisiones %}<li>{{ t }}</li>{% endfor %}</ul>
+          </div>
+          {% endif %}
+        </div>
+
+        {% if p.evaluacion.respuesta_mejorada %}
+        <h3 class="juicio__titulo">Respuesta sugerida</h3>
+        <p>{{ p.evaluacion.respuesta_mejorada }}</p>
+        {% endif %}
+      </div>
+    </details>
+    {% else %}
+    <p class="vacio">Sin responder.</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+
+<div class="acciones">
+  <a class="boton boton--principal" href="/ui">Practicar otra entrevista</a>
+  <a class="boton" href="/entrevistas/{{ ctx.id }}/trazas">Ver trazabilidad de la IA</a>
+</div>
+{% endblock %}

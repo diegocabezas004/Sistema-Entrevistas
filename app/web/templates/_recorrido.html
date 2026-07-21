@@ -1,0 +1,13 @@
+{# Track de progreso de la entrevista. Se reusa en la pantalla de preguntas y
+   en la de resultado; la numeración es real (las preguntas son una secuencia). #}
+<ol class="recorrido">
+  {% for paso in recorrido %}
+  <li class="recorrido__paso recorrido__paso--{{ paso.estado }}">
+    <span class="recorrido__n">{{ "%02d"|format(paso.orden) }}</span>
+    <span class="recorrido__tema">{{ paso.tema }}</span>
+    {% if paso.puntaje is not none %}
+    <span class="recorrido__puntaje">{{ paso.puntaje }}</span>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ol>

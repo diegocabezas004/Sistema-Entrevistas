@@ -49,9 +49,25 @@ python -m app.main
 # o bien:
 uvicorn app.api.app:app --reload
 
+# Interfaz web (las tres pantallas del flujo):
+#   http://127.0.0.1:8000/
 # Documentación interactiva (Swagger):
 #   http://127.0.0.1:8000/docs
 ```
+
+## Interfaz web
+
+Server-rendered con Jinja2, sin frameworks de frontend. Tres pantallas
+encadenadas que consumen el mismo `InterviewService` que la API REST:
+
+| Pantalla | Ruta | Qué hace |
+|---|---|---|
+| Configurar entrevista | `/ui` | Define puesto, tecnología, nivel, tipo y cantidad de preguntas. Incluye los tres escenarios de demostración y el historial de sesiones anteriores. |
+| Responder preguntas | `/ui/entrevistas/{id}` | Muestra la pregunta activa y recoge la respuesta. Al enviarla, la IA la evalúa y aparece la retroalimentación antes de pasar a la siguiente. |
+| Resultado | `/ui/entrevistas/{id}/resultado` | Puntaje general, nivel estimado, áreas fuertes y de mejora, plan de estudio y el desglose pregunta por pregunta. |
+
+Las llamadas a la IA se hacen al entrar a la pantalla: si una falla, basta con
+recargar la página para reintentar, sin perder el avance de la sesión.
 
 ## Pruebas
 
@@ -95,9 +111,10 @@ curl -X POST http://127.0.0.1:8000/entrevistas \
   /storage           -> persistencia SQLite + trazabilidad
   /interview         -> orquestación del flujo completo
   /api               -> endpoints REST (FastAPI)
+  /web               -> interfaz Jinja2 (rutas, plantillas y estilos)
   config.py          -> configuración central (variables de entorno)
   main.py            -> punto de entrada
-/tests               -> 67 pruebas automatizadas
+/tests               -> 80 pruebas automatizadas
 /docs                -> documentación técnica, funcional, manual, prompts, etc.
 ```
 

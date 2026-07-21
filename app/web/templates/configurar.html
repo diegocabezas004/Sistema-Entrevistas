@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block titulo %}Configurar entrevista · Sala de entrevista{% endblock %}
+
+{% block riel %}
+<p class="riel__titulo">Cómo funciona</p>
+<ol class="recorrido">
+  <li class="recorrido__paso recorrido__paso--activa">
+    <span class="recorrido__n">01</span>
+    <span class="recorrido__tema">Configuras el puesto y el nivel</span>
+  </li>
+  <li class="recorrido__paso recorrido__paso--futuro">
+    <span class="recorrido__n">02</span>
+    <span class="recorrido__tema">Respondes las preguntas que genera la IA</span>
+  </li>
+  <li class="recorrido__paso recorrido__paso--futuro">
+    <span class="recorrido__n">03</span>
+    <span class="recorrido__tema">Revisas tu resultado y tu plan de estudio</span>
+  </li>
+</ol>
+{% endblock %}
+
+{% block contenido %}
+<header class="encabezado">
+  <p class="antetitulo">Nueva sesión</p>
+  <h1 class="titular">Arma la entrevista<br>que quieres practicar</h1>
+  <p class="entrada">
+    La IA escribe las preguntas para el puesto que definas y evalúa cada respuesta
+    con retroalimentación puntual. Dos sesiones con la misma configuración nunca
+    traen el mismo set de preguntas.
+  </p>
+</header>
+
+<section class="seccion">
+  <h2 class="seccion__titulo">Escenarios listos</h2>
+  <p class="seccion__nota">Cargan el formulario con una configuración de ejemplo. Puedes ajustarla antes de iniciar.</p>
+  <div class="escenarios">
+    {% for esc in escenarios %}
+    <button type="button" class="escenario" data-escenario="{{ esc.clave }}"
+            data-rol="{{ esc.rol }}" data-tecnologia="{{ esc.tecnologia }}"
+            data-nivel="{{ esc.nivel }}" data-cantidad="{{ esc.cantidad_preguntas }}"
+            data-tipo="{{ esc.tipo }}">
+      <span class="escenario__titulo">{{ esc.titulo }}</span>
+      <span class="escenario__resumen">{{ esc.resumen }}</span>
+      <span class="escenario__meta">{{ esc.tecnologia }} · {{ esc.cantidad_preguntas }} preguntas</span>
+    </button>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="seccion">
+  <h2 class="seccion__titulo">Configuración</h2>
+  <form class="formulario" method="post" action="/ui/entrevistas"
+        data-pendiente="Generando la primera pregunta…" data-etiqueta="Iniciar entrevista">
+
+    <div class="campo campo--ancho">
+      <label for="rol">Puesto</label>
+      <input id="rol" name="rol" type="text" required maxlength="120"
+             placeholder="Desarrollador Backend" autocomplete="off">
+      <span class="campo__ayuda">El cargo al que te postularías.</span>
+    </div>
+
+    <div class="campo campo--ancho">
+      <label for="tecnologia">Tecnología</label>
+      <input id="tecnologia" name="tecnologia" type="text" required maxlength="120"
+             placeholder="Python" autocomplete="off">
+      <span class="campo__ayuda">Lenguaje, framework o área sobre la que quieres las preguntas.</span>
+    </div>
+
+    <div class="campo">
+      <label for="nivel">Nivel</label>
+      <select id="nivel" name="nivel">
+        {% for valor, etiqueta in niveles %}
+        <option value="{{ valor }}">{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="tipo">Tipo de entrevista</label>
+      <select id="tipo" name="tipo">
+        {% for valor, etiqueta in tipos %}
+        <option value="{{ valor }}"{% if valor == 'mixta' %} selected{% endif %}>{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="cantidad_preguntas">Preguntas</label>
+      <input id="cantidad_preguntas" name="cantidad_preguntas" type="number"
+             min="{{ min_preguntas }}" max="{{ max_preguntas }}" value="3" required>
+      <span class="campo__ayuda">Entre {{ min_preguntas }} y {{ max_preguntas }}.</span>
+    </div>
+
+    <div class="campo">
+      <label for="idioma">Idioma</label>
+      <select id="idioma" name="idioma">
+        {% for valor, etiqueta in idiomas %}
+        <option value="{{ valor }}">{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="formulario__pie">
+      <button type="submit" class="boton boton--principal">Iniciar entrevista</button>
+      <span class="formulario__nota">La primera pregunta tarda unos segundos en generarse.</span>
+    </div>
+  </form>
+</section>
+
+<section class="seccion">
+  <h2 class="seccion__titulo">Sesiones anteriores</h2>
+  {% if historial %}
+  <p class="seccion__nota">Compara tus puntajes para ver avances y debilidades que se repiten.</p>
+  <ul class="historial">
+    {% for ent in historial %}
+    <li class="historial__fila">
+      <a class="historial__enlace"
+         href="/ui/entrevistas/{{ ent.id }}{% if ent.estado == 'completada' %}/resultado{% endif %}">
+        <span class="historial__puesto">{{ ent.rol }}</span>
+        <span class="historial__meta">{{ ent.tecnologia }} · {{ ent.nivel_label }} · {{ ent.tipo_label }} · {{ ent.fecha }}</span>
+      </a>
+      {% if ent.puntaje_general is not none %}
+      <span class="historial__puntaje">{{ ent.puntaje_general }}</span>
+      {% else %}
+      <span class="historial__estado">En curso</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="vacio">Todavía no has terminado ninguna entrevista. Configura la primera arriba y aquí quedará el registro para comparar.</p>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block guion %}
+<script>
+  // Rellena el formulario desde un escenario y avisa mientras la IA trabaja.
+  // Es una comodidad: el formulario funciona igual sin JavaScript.
+  document.querySelectorAll('[data-escenario]').forEach(function (boton) {
+    boton.addEventListener('click', function () {
+      var d = boton.dataset;
+      document.getElementById('rol').value = d.rol;
+      document.getElementById('tecnologia').value = d.tecnologia;
+      document.getElementById('nivel').value = d.nivel;
+      document.getElementById('tipo').value = d.tipo;
+      document.getElementById('cantidad_preguntas').value = d.cantidad;
+      document.querySelectorAll('[data-escenario]').forEach(function (otro) {
+        otro.classList.toggle('escenario--activo', otro === boton);
+      });
+    });
+  });
+</script>
+{% endblock %}
