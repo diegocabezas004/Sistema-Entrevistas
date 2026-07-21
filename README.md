@@ -12,7 +12,7 @@ Aplicación que simula entrevistas técnicas usando **IA generativa (Claude / An
 - 🧩 **Arquitectura modular** — cada responsabilidad en su módulo (una sola capa habla con la IA).
 - 🔍 **Coherencia validada** — detecta si una pregunta/evaluación no corresponde al rol/nivel/tecnología.
 - 🗃️ **Trazabilidad total** — se guarda prompt exacto, respuesta cruda, criterios, modelo y fecha/hora de cada llamada.
-- 🧪 **Pruebas automatizadas** — 67 pruebas que corren sin API key (motores simulados).
+- 🧪 **Pruebas automatizadas** — 80 pruebas que corren sin API key (motores simulados).
 - 📊 **Historial y comparación de avances** entre entrevistas.
 
 ---
