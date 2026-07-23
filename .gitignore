@@ -19,6 +19,10 @@ env/
 *.sqlite
 *.sqlite3
 
+# Documentacion (no publicar en GitHub)
+docs/
+BITACORA_CHAT.md
+
 # Sistema / editor
 .DS_Store
 .idea/
